@@ -1,0 +1,50 @@
+<modification>
+	<id>OpenCart coupon flexible (shows coupon discounted price)</id>
+	<version>1.0</version>
+	<vqmver>1</vqmver>
+	<author>Alexander Toporkov (toporchillo@gmail.com)</author>
+	<file name="catalog/controller/checkout/confirm.php">
+		<operation>
+			<search position="after"><![CDATA[$this->data['totals'] = $total_data;]]></search>
+			<add><![CDATA[
+			foreach ($total_data as $tot) {
+				if (isset($tot['discounted_products']) && !empty($tot['discounted_products'])) {
+					$d_prod = $tot['discounted_products'];
+					foreach ($this->data['products'] as $k=>$prod) {
+						if (isset($d_prod[$prod['product_id']]) && $prod['price'] !== false) {
+							$this->data['products'][$k]['price'] =  '<span class="error">'.$this->currency->format($this->tax->calculate($d_prod[$prod['product_id']], $product['tax_class_id'], $this->config->get('config_tax'))).'</span>';
+							$this->data['products'][$k]['total'] =  '<span class="error">'.$this->currency->format($this->tax->calculate($d_prod[$prod['product_id']], $product['tax_class_id'], $this->config->get('config_tax')) * $product['quantity']).'</span>';
+						}
+					}
+					break;
+				}
+			}
+			]]></add>
+		</operation>
+	</file>
+    <file name="catalog/controller/checkout/cart.php">
+		<operation>
+			<search position="after"><![CDATA[$this->data['products'][] = array(]]></search>
+			<add><![CDATA[
+					'product_id' => $product['product_id'],
+			]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[$this->data['totals'] = $total_data;]]></search>
+			<add><![CDATA[
+			foreach ($total_data as $tot) {
+				if (isset($tot['discounted_products']) && !empty($tot['discounted_products'])) {
+					$d_prod = $tot['discounted_products'];
+					foreach ($this->data['products'] as $k=>$prod) {
+						if (isset($d_prod[$prod['product_id']]) && $prod['price'] !== false) {
+							$this->data['products'][$k]['price'] =  '<span class="error">'.$this->currency->format($this->tax->calculate($d_prod[$prod['product_id']], $product['tax_class_id'], $this->config->get('config_tax'))).'</span>';
+							$this->data['products'][$k]['total'] =  '<span class="error">'.$this->currency->format($this->tax->calculate($d_prod[$prod['product_id']], $product['tax_class_id'], $this->config->get('config_tax')) * $product['quantity']).'</span>';
+						}
+					}
+					break;
+				}
+			}
+			]]></add>
+		</operation>
+	</file>
+</modification>
